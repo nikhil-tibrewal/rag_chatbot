@@ -4,7 +4,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter  # For splitt
 from langchain_community.vectorstores import FAISS  # For storing and retrieving vectorized chunks
 from langchain_openai import OpenAIEmbeddings  # Embedding model from OpenAI
 from langchain.chains import RetrievalQA  # Retrieval-Augmented Generation chain
-from langchain.chat_models import ChatOpenAI  # Chat model from OpenAI
+from langchain_community.chat_models import ChatOpenAI  # Chat model from OpenAI
 
 # Constants
 DATA_DIR = "data"  # Directory where PDF files are stored
