@@ -12,6 +12,9 @@ INDEX_DIR = "faiss_index"  # Directory to store the FAISS vector index
 CHUNK_SIZE = 500  # Size of each text chunk (in tokens)
 CHUNK_OVERLAP = 50  # Number of overlapping tokens between chunks
 
+# Load environment variables from .env into os.environ.
+from dotenv import load_dotenv
+load_dotenv()
 
 def load_all_pdfs(data_dir=DATA_DIR):
     """
