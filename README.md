@@ -45,3 +45,11 @@ Basic logging is enabled to `logs.txt`. You can add LangSmith support later for 
 - [OpenAI](https://platform.openai.com/)
 - [FAISS](https://github.com/facebookresearch/faiss)
 - [Streamlit](https://streamlit.io/)
+
+## GCP Instance Config
+
+- Settings:
+	- Name: rag-chatbot
+	- Machine Type: e2-micro (2 vCPU, 1 GB RAM)
+	- Boot Disk: Ubuntu 22.04 LTS (20 GB)
+	- Allow HTTP traffic
