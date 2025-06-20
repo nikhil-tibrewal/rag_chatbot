@@ -4,3 +4,4 @@ __pycache__/
 faiss_index/
 logs.txt
 index_log.txt
+.DS_Store
