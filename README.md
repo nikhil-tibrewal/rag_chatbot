@@ -4,17 +4,31 @@ This project is a **Retrieval-Augmented Generation (RAG)** chatbot that allows y
 
 ---
 
-## 🔧 Architecture Overview
+## Architecture Overview
 
+This project uses a RAG (Retrieval-Augmented Generation) architecture with the following flows:
+
+### Retrieval Flow (Query-time)
 ```mermaid
 graph TD
     A[User Query] --> B[Streamlit Interface]
     B --> C[LangChain Retriever]
     C --> D[FAISS Vectorstore]
-    C --> E[OpenAI LLM]
-    D --> F[Embedded Chunks from PDF files]
-    E --> G[Response]
+    D --> E[Relevant Context Chunks]
+    E --> F[OpenAI LLM]
+    F --> G[Response]
     G --> B
+```
+
+### Vectorstore Generation Flow (Index-time)
+```mermaid
+graph TD
+    A[PDF Files in data/] --> B[PyPDFLoader]
+    B --> C[LangChain Text Splitter]
+    C --> D[Text Chunks]
+    D --> E[OpenAI Embeddings]
+    E --> F[FAISS Vectorstore]
+    F --> G[Saved to faiss_index/]
 ```
 
 - Documents from the `data/` folder are embedded using OpenAI Embeddings.
