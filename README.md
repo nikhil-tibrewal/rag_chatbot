@@ -18,7 +18,7 @@ graph TD
 ```
 
 - Documents from the `data/` folder are embedded using OpenAI Embeddings.
-- The resulting vectors are stored in a FAISS vectorstore.
+- The resulting vectors are stored in a local FAISS vectorstore.
 - The retriever fetches relevant chunks from FAISS given a user query.
 - The final response is generated using OpenAI LLM via LangChain.
 - Streamlit provides the interactive frontend.
@@ -103,7 +103,7 @@ To build or rebuild the index:
 python build_index.py
 ```
 
-This loads and splits the PDFs, embeds the chunks, and stores the vectors in a FAISS index.
+This loads and splits the PDFs, embeds the chunks, and stores the vectors in a FAISS index. Note: due to the size of the PDF files, this can take some time.
 
 ---
 
@@ -142,7 +142,7 @@ tmux attach -t ragchat
 ## 📎 Notes
 
 - To add new documents, just place them in the `data/` folder and rerun `python build_index.py`.
-- FAISS vectorstore is stored in `index/` directory.
+- FAISS vectorstore is stored in `faiss_index/` directory.
 
 ---
 
