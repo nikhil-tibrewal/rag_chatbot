@@ -3,6 +3,7 @@ from langchain_community.document_loaders import PyPDFLoader  # For reading PDF 
 from langchain.text_splitter import RecursiveCharacterTextSplitter  # For splitting long texts into smaller chunks
 from langchain_community.vectorstores import FAISS  # For storing and retrieving vectorized chunks
 from langchain_openai import OpenAIEmbeddings  # Embedding model from OpenAI
+from openai import OpenAI
 from langchain.chains import RetrievalQA  # Retrieval-Augmented Generation chain
 from langchain_community.chat_models import ChatOpenAI  # Chat model from OpenAI
 
@@ -15,6 +16,8 @@ CHUNK_OVERLAP = 50  # Number of overlapping tokens between chunks
 # Load environment variables from .env into os.environ.
 from dotenv import load_dotenv
 load_dotenv()
+
+custom_client = OpenAI()  # create OpenAI client explicitly (no proxies kwarg)
 
 def load_all_pdfs(data_dir=DATA_DIR):
     """
@@ -46,7 +49,7 @@ def build_vectorstore(chunks):
     """
     Embed all text chunks using OpenAI and save them into a FAISS vector index.
     """
-    embeddings = OpenAIEmbeddings()
+    embeddings = OpenAIEmbeddings(client=custom_client)
     vectorstore = FAISS.from_documents(chunks, embeddings)
     vectorstore.save_local(INDEX_DIR)
 
@@ -55,7 +58,7 @@ def get_vectorstore():
     """
     Load an existing FAISS vector index from disk.
     """
-    embeddings = OpenAIEmbeddings()
+    embeddings = OpenAIEmbeddings(client=custom_client)
     return FAISS.load_local(INDEX_DIR, embeddings)
 
 
