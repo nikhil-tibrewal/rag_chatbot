@@ -46,24 +46,39 @@ def split_documents(documents):
 
 def build_vectorstore(chunks, batch_size=100):
     """
-    Efficiently embed all text chunks using OpenAI and save them into a FAISS vector index.
-    Uses batch embedding with tqdm progress bar to optimize speed and show progress.
+    Embed all text chunks using OpenAI and save them into a FAISS vector index.
+
+    Parameters:
+    - chunks (List[Document]): List of LangChain Document objects.
+    - batch_size (int): Number of chunks to embed per API call to speed up the process.
     """
-    print(f"Embedding {len(chunks)} chunks in batches of {batch_size}...")
+    print(f"\nTotal chunks to embed: {len(chunks)}")
 
-    embeddings_model = OpenAIEmbeddings()
+    # Initialize OpenAI embedding model
+    embeddings = OpenAIEmbeddings()
+
+    # Extract texts from the Document objects
     texts = [doc.page_content for doc in chunks]
-    metadatas = [doc.metadata for doc in chunks]
 
+    # Prepare to collect all embeddings
     all_embeddings = []
-    for batch in tqdm(chunked(texts, batch_size), total=len(texts) // batch_size + 1, desc="Embedding batches"):
-        all_embeddings.extend(embeddings_model.embed_documents(batch))
+    print(f"Embedding {len(texts)} chunks in batches of {batch_size}...")
 
-    # Rebuild the FAISS index from batched embeddings
-    vectorstore = FAISS.from_embeddings(all_embeddings, chunks, metadatas=metadatas)
+    # Run batch embedding with progress bar
+    for i in tqdm(range(0, len(texts), batch_size), desc="Embedding batches"):
+        batch = texts[i:i + batch_size]
+        batch_embeddings = embeddings.embed_documents(batch)
+        all_embeddings.extend(batch_embeddings)
 
+    print("Embeddings complete. Building FAISS index...")
+
+    # Reconstruct Document objects with the embeddings and metadata
+    metadatas = [doc.metadata for doc in chunks]
+    vectorstore = FAISS.from_texts(texts, embeddings, metadatas=metadatas)
+
+    # Save index locally
     vectorstore.save_local(INDEX_DIR)
-    print(f"FAISS index saved to {INDEX_DIR}")
+    print(f"FAISS index saved to: {INDEX_DIR}\n")
 
 
 def get_vectorstore():
