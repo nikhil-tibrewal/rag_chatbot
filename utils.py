@@ -5,6 +5,8 @@ from langchain_community.vectorstores import FAISS  # For storing and retrieving
 from langchain_openai import OpenAIEmbeddings  # Embedding model from OpenAI
 from langchain.chains import RetrievalQA  # Retrieval-Augmented Generation chain
 from langchain_community.chat_models import ChatOpenAI  # Chat model from OpenAI
+from tqdm import tqdm
+from more_itertools import chunked  # pip install more-itertools if not already installed
 
 # Constants
 DATA_DIR = "data"  # Directory where PDF files are stored
@@ -42,13 +44,26 @@ def split_documents(documents):
     return splitter.split_documents(documents)
 
 
-def build_vectorstore(chunks):
+def build_vectorstore(chunks, batch_size=100):
     """
-    Embed all text chunks using OpenAI and save them into a FAISS vector index.
+    Efficiently embed all text chunks using OpenAI and save them into a FAISS vector index.
+    Uses batch embedding with tqdm progress bar to optimize speed and show progress.
     """
-    embeddings = OpenAIEmbeddings()
-    vectorstore = FAISS.from_documents(chunks, embeddings)
+    print(f"Embedding {len(chunks)} chunks in batches of {batch_size}...")
+
+    embeddings_model = OpenAIEmbeddings()
+    texts = [doc.page_content for doc in chunks]
+    metadatas = [doc.metadata for doc in chunks]
+
+    all_embeddings = []
+    for batch in tqdm(chunked(texts, batch_size), total=len(texts) // batch_size + 1, desc="Embedding batches"):
+        all_embeddings.extend(embeddings_model.embed_documents(batch))
+
+    # Rebuild the FAISS index from batched embeddings
+    vectorstore = FAISS.from_embeddings(all_embeddings, chunks, metadatas=metadatas)
+
     vectorstore.save_local(INDEX_DIR)
+    print(f"FAISS index saved to {INDEX_DIR}")
 
 
 def get_vectorstore():
