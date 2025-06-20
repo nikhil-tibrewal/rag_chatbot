@@ -54,9 +54,13 @@ def build_vectorstore(chunks):
 def get_vectorstore():
     """
     Load an existing FAISS vector index from disk.
+
+    Note: FAISS uses Pickle internally. To enable loading the index,
+    we must explicitly allow deserialization by setting `allow_dangerous_deserialization=True`.
+    Only do this if you trust the source of the index file (i.e., you built it yourself).
     """
     embeddings = OpenAIEmbeddings()
-    return FAISS.load_local(INDEX_DIR, embeddings)
+    return FAISS.load_local(INDEX_DIR, embeddings, allow_dangerous_deserialization=True)
 
 
 def load_qa_chain():
